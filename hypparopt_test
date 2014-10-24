@@ -1,0 +1,5 @@
+%hypparopt test script
+%Script to experiment with hyperparameter optimization through the gradient
+%of the post marg likelihood through the covariance of the distribution of
+%weights (?) of basis functions
+

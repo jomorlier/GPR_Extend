@@ -1,0 +1,59 @@
+% %Choose kernel
+% kern = 1
+% switch kern
+%     case 1
+% end
+k = @(x,y) exp(-100*(x-y)'*(x-y));
+
+%Choose sample
+x = (0:.005:1);
+n = length(x);
+l = floor(n/2);
+
+%Construct covariance matrix
+C = zeros(n,n);
+for i = 1:n
+    for j = 1:n
+        C(i,j) = k(x(i),x(j));
+    end
+end
+
+%Construct covariance matrix blocks
+for i = 1:l
+    for j = 1:l
+        Kxx(i,j) = C(i,j);
+    end
+end
+for i = l+1:n
+    for j = 1:l
+        Kxox(i-l,j) = C(i,j);
+    end
+end
+for i = 1:l
+    for j = l+1:n
+        Kxxo(i,j-l) = C(i,j);
+    end
+end
+for i = l+1:n
+    for j = l+1:n
+        Kxoxo(i-l,j-l) = C(i,j);
+    end
+end
+
+ftr = exp(x(1:l+1))';
+
+%Joint Posterior Distribution Computations
+mu = Kxox*(Kxx^-1)*ftr;         %New mean
+D = Kxoxo - Kxox*(Kxx^-1)*Kxxo; %New Covariance
+
+%Sample from Gaussian Process at points
+u = randn(n,1);                 %sample from normal disctribution
+[A,S,B] = svd(C);               %factor C
+f = A*sqrt(S)*u;                %resulting output
+
+%Plot
+figure;
+hold on;
+clf;
+plot(x,f,'-');
+axis([0,1,-2,2]);
