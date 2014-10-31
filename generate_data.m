@@ -10,9 +10,12 @@ xtest = [x(ntrain+1:end) xpost];
 ytrain = y(1:ntrain);
 ytest = y(ntrain+1:end);
 
-cov = {@covSEiso}; sf = 1; ell = 0.4;                             % setup the GP
-hyp0.cov  = log([ell;sf]);
-mean = {@meanZero};
+cov = {@covSum, {@covSEiso, @covConst_2}}; sf = 1; ell = 0.4;                             % setup the GP
+% hyp0.cov  = [log([ell;sf]) log([ell;sf])]; 
+c2 = 4;
+hyp0.cov = [log([ell;sf]) ;log(c2)];
+% hyp0.cov = [];
+mean = {@meanSum, {@meanZero,@meanZero}};
 hyp0.mean = [];
 lik = {@likGauss}; sn = 0.2;
 hyp0.lik  = log(sn);
@@ -21,7 +24,6 @@ Ncg = 50;                                   % number of conjugate gradient steps
 % ymu{1} = f(xte); ys2{1} = sn^2; nlZ(1) = -Inf;
 
 hyp = minimize(hyp0,'gp', -Ncg, inf, mean, cov, lik, xtrain', ytrain'); % opt hypers
-
 [ymu ys2 fmu fs2] = gp(hyp, inf, mean, cov, lik, xtrain', ytrain', xtest');
 
 hold on;
