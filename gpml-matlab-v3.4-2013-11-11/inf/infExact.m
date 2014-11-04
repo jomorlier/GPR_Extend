@@ -14,8 +14,13 @@ if ~ischar(likstr), likstr = func2str(likstr); end
 if ~strcmp(likstr,'likGauss')               % NOTE: no explicit call to likGauss
   error('Exact inference only possible with Gaussian likelihood');
 end
- 
+
 [n, D] = size(x);
+
+basis_flag = 0;
+if iscell(cov), covstr = cov{1}; else covstr = cov; end
+if strcmp(covstr,'@covSumBasis'), basis_flag = 1; end
+
 K = feval(cov{:}, hyp.cov, x);                      % evaluate covariance matrix
 m = feval(mean{:}, hyp.mean, x);                          % evaluate mean vector
 
@@ -39,7 +44,11 @@ if nargout>1                               % do we want the marginal likelihood?
     dnlZ = hyp;                                 % allocate space for derivatives
     Q = solve_chol(L,eye(n))/sl - alpha*alpha';     % precompute for convenience
     for i = 1:numel(hyp.cov)
-      dnlZ.cov(i) = sum(sum(Q.*feval(cov{:}, hyp.cov, x, [], i)))/2;
+      if basis_flag
+          dnlZ.cov(i) = sum(sum(Q.*feval(cov{:}, hyp.cov, x, [], i, y)))/2;
+      else
+          dnlZ.cov(i) = sum(sum(Q.*feval(cov{:}, hyp.cov, x, [], i)))/2;
+      end
     end
     dnlZ.lik = sn2*trace(Q);
     for i = 1:numel(hyp.mean), 

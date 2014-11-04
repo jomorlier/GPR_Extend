@@ -1,11 +1,9 @@
 function K = covSumBasis(cov, hyp, x, z, i, y)
-dbstack
+% dbstack
 % covSumBasis - another attempt at the implementation of additional basis
 % function code, from GPML 2.7 Eq. 2.39-42
-%
-% Copyright (c) by Carl Edward Rasmussen & Hannes Nickisch 2010-09-10.
-%
-% See also COVFUNCTIONS.M.
+% MBocamazo 2014-Oct
+
 
 if numel(cov)==0, error('We require at least one summand.'), end
 for ii = 1:numel(cov)                        % iterate over covariance functions
@@ -37,34 +35,45 @@ for ii = 1:length(cov)
 end
 
 if nargin<=6                                                        % covariances
+    if dg
+        K = zeros(size(x,1),1); return
+    end
     K = 0;     
     for ii = 1:length(cov)                      % iteration over summand functions
         f = cov(ii); 
         if iscell(f{:}), f = f{:}; end % expand cell array if necessary
         K = K + feval(f{:}, hyp(v==ii), x, x);              % accumulate covariances
     end
+    if xeqz
+        q = x;
+    else
+        q = [x; z];
+    end
     Ko = K; %save Ko
     K = 0;
     for ii = 1:length(cov)                      % iteration over summand functions
         f = cov(ii); 
         if iscell(f{:}), f = f{:}; end % expand cell array if necessary
-        K = K + feval(f{:}, hyp(v==ii), x, z);              % accumulate covariances
+        K = K + feval(f{:}, hyp(v==ii), x, q);              % accumulate covariances
     end
+    Kq = K;
     
-    sf2 = exp(2*hyp(end)); 
-    Kz = K;
-    Ky = Ko+sf2*eye(size(Ko));
-    %need access to y
+    K = 0;
+    for ii = 1:length(cov)                      % iteration over summand functions
+        f = cov(ii); 
+        if                                                                                                  iscell(f{:}), f = f{:}; end % expand cell array if necessary
+        K = K + feval(f{:}, hyp(v==ii), q, q);              % accumulate covariances
+    end
+    Kqq = K;
+    
+
     
     H = [sin(x) cos(x)]';
-    if xeqz
-        z = x;
-    end
-    if dg
-        K = zeros(size(x,1),1); return
-    end
 
-    Hz = [sin(z) cos(z)]';
+    Hq = [sin(q) cos(q)]';
+    
+    sf2 = exp(2*hyp(end));
+    Ky = Ko+sf2*eye(size(Ko));
     sf2 = exp(2*hyp(end)); 
     sigma_B = hyp(end-1); % possible that this should be the log to follow the other hyppars
     N = size(H,1);
@@ -74,10 +83,13 @@ if nargin<=6                                                        % covariance
     Ky_inv = inv(Ky);
     A = inv(B) + H*Ky_inv*H';
     A_inv = inv(A);
-    R = Hz - H*Ky_inv*Kz;
-    K = Kz + R'*inv(B_inv+H*Ky_inv*H')*R;
     
+    R = Hq - H*Ky_inv*Kq;
+    K = Kqq + R'*inv(B_inv+H*Ky_inv*H')*R;  %with xeqz, symmetric matrix kxx
     
+    if ~xeqz %cross covariances kxz
+        K = K(length(x)+1:end,1:length(x))';
+    end
 end
 %need cov calc'ed to comp the derivative
 

@@ -1,4 +1,4 @@
-%Generate data
+%Generate clean
 x = linspace(0,30,1000);
 xpost = linspace(30,50,1000);
 r = randperm(length(x));
@@ -13,7 +13,7 @@ ytest = y(ntrain+1:end);
 cov = {@covSum, {@covSEiso, @covConst_2}}; sf = 1; ell = 0.4;                             % setup the GP
 % hyp0.cov  = [log([ell;sf]) log([ell;sf])]; 
 c2 = 4;
-hyp0.cov = [log([ell;sf]) ;log(c2)];
+hyp0.cov = [log([ell;sf]); log(c2)];
 % hyp0.cov = [];
 mean = {@meanSum, {@meanZero,@meanZero}};
 hyp0.mean = [];
@@ -30,4 +30,5 @@ hold on;
 plot(xtrain,ytrain,'o');
 % plot(xtest,ytest,'o');
 plot(xtest,ymu,'.r');
+plot(xtest,ytest,'.c')
 [ymu ys2 fm2 fs2 lp] = gp(hyp, inf, mean, cov, lik, xtrain', ytrain', xtest', ytest');

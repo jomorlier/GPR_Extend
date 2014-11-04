@@ -29,8 +29,12 @@ hyp = minimize(hyp0,'gp', -Ncg, inf, mean, cov, lik, xtrain', ytrain'); % opt hy
 [ymu ys2 fmu fs2] = gp(hyp, inf, mean, cov, lik, xtrain', ytrain', xtest');
 
 hold on;
-plot(xtrain,ytrain,'o');
+plot(xtrain,ytrain,'o','MarkerSize',8);
 % plot(xtest,ytest,'o');
 plot(xtest,ymu,'.r');
 plot(xtest,ytest,'.c')
 [ymu ys2 fm2 fs2 lp] = gp(hyp, inf, mean, cov, lik, xtrain', ytrain', xtest', ytest');
+xlabel('Explanatory');
+ylabel('Output');
+title('Comparison of Actual Function, Model Output');
+legend('Train','Model Output','Underlying Function');

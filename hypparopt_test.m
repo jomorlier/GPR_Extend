@@ -24,7 +24,7 @@ deriv_B = 2*sigma_B*eye(N);
 %Need: Ky, H, y; Ky should be positive definite, shouldn't be any other
 %restrictions
 
-epsilon = 0.1;
+epsilon = 0.01;
 sigma_B_left =  sigma_B-epsilon;
 B_left  = sigma_B_left^2 *eye(N);
 PML_left  = evaluate_PML(B_left, Ky,Ky_inv,H);
@@ -48,7 +48,12 @@ disp(theor_deriv_PML)
         A = B_inv + H*Ky_inv*H';
         A_inv = inv(A);
         C = Ky_inv*H'*A_inv*H*Ky_inv;
-        PML = -1/2*y'*inv(C)*y-1/2*log(det(B))-1/2*log(det(A));    
-        theor_deriv_PML = 1/2*y'*Ky_inv*H'*A_inv*B_inv*deriv_B*B_inv*A_inv*H*Ky_inv*y -1/2*trace(B_inv*deriv_B) -1/2*trace(-A_inv*B_inv*deriv_B*B_inv);
+        PML = -1/2*y'*inv(C)*y;    
+%         PML = -1/2*log(det(B))-1/2*log(det(A));    
+%         PML = -1/2*y'*inv(C)*y-1/2*log(det(B))-1/2*log(det(A));    
+        theor_deriv_PML = -1/2*y'*Ky_inv*H'*inv(A)*inv(B)*deriv_B*inv(B)*inv(A)*H*Ky_inv*y;
+%         theor_deriv_PML = -1/2*y'*Ky_inv*H'*inv(A)*inv(B)*deriv_B*inv(B)*inv(A)*H*Ky_inv*y -1/2*trace(B_inv*deriv_B) -1/2*trace(-A_inv*B_inv*deriv_B*B_inv);
+%                          -1/2*y'*Ky_inv*H'*inv(A)*inv(B)*deriv_B*inv(B)*inv(A)*H*Ky_inv*y -1/2*trace(B_inv*deriv_B) -1/2*trace(-A_inv*B_inv*deriv_B*B_inv);
     end
+
 end

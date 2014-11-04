@@ -1,5 +1,5 @@
 function [varargout] = likGauss(hyp, y, mu, s2, inf, i)
-dbstack
+% dbstack
 % likGauss - Gaussian likelihood function for regression. The expression for the 
 % likelihood is 
 %   likGauss(t) = exp(-(t-y)^2/2*sn^2) / sqrt(2*pi*sn^2),
