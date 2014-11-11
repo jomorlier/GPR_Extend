@@ -1,10 +1,10 @@
-function K = covSumBasis(cov, hyp, x, z, i, y)
+function [K, Basis_Addend] = covSumBasis(cov, hyp, x, z, i, y)
 % dbstack
 % covSumBasis - another attempt at the implementation of additional basis
 % function code, from GPML 2.7 Eq. 2.39-42
 % MBocamazo 2014-Oct
 
-
+Basis_Addend = 0;
 if numel(cov)==0, error('We require at least one summand.'), end
 for ii = 1:numel(cov)                        % iterate over covariance functions
   f = cov(ii); 
@@ -72,6 +72,7 @@ if nargin<=6                                                        % covariance
 
     Hq = [sin(q) cos(q)]';
     
+    b = [-1; -1];
     sf2 = exp(2*hyp(end));
     Ky = Ko+sf2*eye(size(Ko));
     sf2 = exp(2*hyp(end)); 
@@ -90,10 +91,17 @@ if nargin<=6                                                        % covariance
     if ~xeqz %cross covariances kxz
         K = K(length(x)+1:end,1:length(x))';
     end
+    if nargout == 2
+        beta_mean = inv(B_inv+H*Ky_inv*H');
+        beta_mean = beta_mean*(H*Ky_inv*y+B_inv*b);
+        Basis_Addend = R'*beta_mean;
+        Basis_Addend = Basis_Addend(length(x)+1:end);
+    end
+    
 end
 %need cov calc'ed to comp the derivative
 
-if nargin==6                                                        % derivatives  
+if (nargin==6) && (nargout == 1)                                   % derivatives  
   if i<=length(v)
     vi = v(i);                                       % which covariance function
     j = sum(v(1:i)==vi);                    % which parameter in that covariance

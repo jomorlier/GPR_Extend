@@ -151,8 +151,12 @@ else
       Ks = feval(cov{:}, hyp.cov, x(nz,:), xs(id,:));        % avoid computation
     end
     ms = feval(mean{:}, hyp.mean, xs(id,:));
+    Basis_Addend = 0;
+    if strcmp(cov1,'covSumBasis');
+        [~, Basis_Addend] = feval(cov{:}, hyp.cov, x(nz,:), xs(id,:), [], y);
+    end
     N = size(alpha,2);  % number of alphas (usually 1; more in case of sampling)
-    Fmu = repmat(ms,1,N) + Ks'*full(alpha(nz,:));        % conditional mean fs|f
+    Fmu = repmat(ms,1,N) + Ks'*full(alpha(nz,:))+Basis_Addend;        % conditional mean fs|f
     fmu(id) = sum(Fmu,2)/N;                                   % predictive means
     if Lchol    % L contains chol decomp => use Cholesky parameters (alpha,sW,L)
       V  = L'\(repmat(sW,1,length(id)).*Ks);
