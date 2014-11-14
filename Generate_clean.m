@@ -23,10 +23,12 @@ hyp0.lik  = log(sn);
 inf = {@infExact}; 
 Ncg = 50;                                   % number of conjugate gradient steps
 % ymu{1} = f(xte); ys2{1} = sn^2; nlZ(1) = -Inf;
-[nlZ dnlZ          ] = gp(hyp0, inf, mean, cov, lik, x, y);
+% disp(hyp0)
+[nlZ0 dnlZ0          ] = gp(hyp0, inf, mean, cov, lik, xtrain', ytrain');
+hyp = minimize(hyp0,'gp', -Ncg, inf, mean, cov, lik, xtrain', ytrain'); % opt hypers
+[nlZ dnlZ          ] = gp(hyp, inf, mean, cov, lik, xtrain', ytrain');
+[ymu ys2 fmu fs2] = gp(hyp, inf, mean, cov, lik, xtrain', ytrain', xtest');
 
-% hyp = minimize(hyp0,'gp', -Ncg, inf, mean, cov, lik, xtrain', ytrain'); % opt hypers
-% [ymu ys2 fmu fs2] = gp(hyp, inf, mean, cov, lik, xtrain', ytrain', xtest');
 % 
 % hold on;
 % plot(xtrain,ytrain,'o');

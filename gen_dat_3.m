@@ -33,6 +33,7 @@ disp(hyp0)
 
 disp(mean(mean(nlZ)))
 plot(i,mean(mean(nlZ)))
+plotyy(i,dnlZ.cov(2),'g')
 end
 
 
