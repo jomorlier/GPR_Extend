@@ -15,26 +15,24 @@ cov = {@covSEiso};
 sf =  1;
 ell = 0.4;
 hyp0.cov = [log(sf), log(ell)];
-mean = {@meanZero};
+mean_ = {@meanZero};
 hyp0.mean = [];
 lik = {@likGauss};
 sn = 0.2;
 hyp0.lik = log(sn);
 inf = {@infExact};
+disp(hyp0.cov)
+hold on;
+%gradient descent produces strange results
+for i = 1:1000
+[nlZ, dnlZ] = gp(hyp0, inf, mean_, cov, lik, xtrain, ytrain);
+disp(dnlZ)
+hyp0.cov = hyp0.cov-0.0001*dnlZ.cov;
+hyp0.lik = hyp0.lik-0.0001*dnlZ.lik;
+disp(hyp0)
 
-% disp(hyp0.cov)
-% [nlZ, dnlZ] = gp(hyp0, inf, mean, cov, lik, xtrain, ytrain);
-% disp(dnlZ)
-% hyp0.cov = hyp0.cov-0.1*dnlZ.cov;
-% disp(hyp0.cov)
-% disp(sum(sum(nlZ)))
-% [nlZ, dnlZ] = gp(hyp0, inf, mean, cov, lik, xtrain, ytrain);
-% disp(dnlZ)
-% hyp0.cov = hyp0.cov-0.00001*dnlZ.cov;
-% disp(hyp0.cov)
-% disp(sum(sum(nlZ)))
-% [nlZ, dnlZ] = gp(hyp0, inf, mean, cov, lik, xtrain, ytrain);
-% disp(dnlZ)
-% disp(sum(sum(nlZ)))
+disp(mean(mean(nlZ)))
+plot(i,mean(mean(nlZ)))
+end
 
 

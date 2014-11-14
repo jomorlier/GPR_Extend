@@ -1,4 +1,5 @@
 %Generate clean
+clear;
 x = linspace(0,30,1000);
 xpost = linspace(30,50,1000);
 r = randperm(length(x));
@@ -22,13 +23,14 @@ hyp0.lik  = log(sn);
 inf = {@infExact}; 
 Ncg = 50;                                   % number of conjugate gradient steps
 % ymu{1} = f(xte); ys2{1} = sn^2; nlZ(1) = -Inf;
+[nlZ dnlZ          ] = gp(hyp0, inf, mean, cov, lik, x, y);
 
-hyp = minimize(hyp0,'gp', -Ncg, inf, mean, cov, lik, xtrain', ytrain'); % opt hypers
-[ymu ys2 fmu fs2] = gp(hyp, inf, mean, cov, lik, xtrain', ytrain', xtest');
-
-hold on;
-plot(xtrain,ytrain,'o');
-% plot(xtest,ytest,'o');
-plot(xtest,ymu,'.r');
-plot(xtest,ytest,'.c')
-[ymu ys2 fm2 fs2 lp] = gp(hyp, inf, mean, cov, lik, xtrain', ytrain', xtest', ytest');
+% hyp = minimize(hyp0,'gp', -Ncg, inf, mean, cov, lik, xtrain', ytrain'); % opt hypers
+% [ymu ys2 fmu fs2] = gp(hyp, inf, mean, cov, lik, xtrain', ytrain', xtest');
+% 
+% hold on;
+% plot(xtrain,ytrain,'o');
+% % plot(xtest,ytest,'o');
+% plot(xtest,ymu,'.r');
+% plot(xtest,ytest,'.c')
+% [ymu ys2 fm2 fs2 lp] = gp(hyp, inf, mean, cov, lik, xtrain', ytrain', xtest', ytest');
