@@ -29,6 +29,43 @@ else
   L = chol(K/sn2+eye(n)); sl = sn2;                       % Cholesky factor of B
   pL = L;                                           % L = chol(eye(n)+sW*sW'.*K)
 end
+
+    if xeqz
+        q = x;
+    else
+        q = [x; z];
+    end
+    H = [sin(x) cos(x)]';
+
+    Hq = [sin(q) cos(q)]';
+    
+    b = [-1; -1];
+    sf2 = exp(2*hyp(end));
+    Ky = Ko+sf2*eye(size(Ko));
+    sf2 = exp(2*hyp(end)); 
+    sigma_B = hyp(end-1); % possible that this should be the log to follow the other hyppars
+    N = size(H,1);
+    B = sigma_B^2*eye(N);
+    B_inv = inv(B);
+    deriv_B = 2*sigma_B*eye(N); 
+    Ky_inv = inv(Ky);
+    A = inv(B) + H*Ky_inv*H';
+    A_inv = inv(A);
+    
+    R = Hq - H*Ky_inv*Kq;
+    K = Kqq + R'*inv(B_inv+H*Ky_inv*H')*R;  %with xeqz, symmetric matrix kxx
+    
+    if ~xeqz %cross covariances kxz
+        K = K(length(x)+1:end,1:length(x))';
+    end
+    if nargout == 2
+        beta_mean = inv(B_inv+H*Ky_inv*H');
+        beta_mean = beta_mean*(H*Ky_inv*y+B_inv*b);
+        Basis_Addend = R'*beta_mean;
+        Basis_Addend = Basis_Addend(length(x)+1:end);
+    end
+    
+    
 alpha = solve_chol(L,y-m)/sl;
 
 post.alpha = alpha;                            % return the posterior parameters
@@ -47,5 +84,8 @@ if nargout>1                               % do we want the marginal likelihood?
     for i = 1:numel(hyp.mean), 
       dnlZ.mean(i) = -feval(mean{:}, hyp.mean, x, i)'*alpha;
     end
+  elseif i==length(v)+2
+      K = -1/2*y'*Ky_inv*H'*A_inv*B_inv*deriv_B*B_inv*A_inv*H*Ky_inv*y -1/2*trace(B_inv*deriv_B) -1/2*trace(-A_inv*B_inv*deriv_B*B_inv);
+  end
   end
 end

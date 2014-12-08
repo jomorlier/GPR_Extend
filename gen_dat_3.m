@@ -21,19 +21,23 @@ lik = {@likGauss};
 sn = 0.2;
 hyp0.lik = log(sn);
 inf = {@infExact};
-disp(hyp0.cov)
-hold on;
-%gradient descent produces strange results
-for i = 1:1000
-[nlZ, dnlZ] = gp(hyp0, inf, mean_, cov, lik, xtrain, ytrain);
-disp(dnlZ)
-hyp0.cov = hyp0.cov-0.0001*dnlZ.cov;
-hyp0.lik = hyp0.lik-0.0001*dnlZ.lik;
-disp(hyp0)
 
-disp(mean(mean(nlZ)))
-plot(i,mean(mean(nlZ)))
-plotyy(i,dnlZ.cov(2),'g')
-end
+
+
+
+
+% hold on;
+% %gradient descent produces strange results
+% for i = 1:1000
+% [nlZ, dnlZ] = gp(hyp0, inf, mean_, cov, lik, xtrain, ytrain);
+% disp(dnlZ)
+% hyp0.cov = hyp0.cov-0.0001*dnlZ.cov;
+% hyp0.lik = hyp0.lik-0.0001*dnlZ.lik;
+% disp(hyp0)
+% 
+% disp(mean(mean(nlZ)))
+% plot(i,mean(mean(nlZ)))
+% plotyy(i,dnlZ.cov(2),'g')
+% end
 
 
